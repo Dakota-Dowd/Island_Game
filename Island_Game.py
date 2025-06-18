@@ -1,11 +1,20 @@
-# Trying to make a little player
-
+"""
+This is the main file of the Island Game
+"""
+# Setting up
 import pygame
 import random
+from Classes_Functions import Button_Function
 pygame.init()
 
+# Screen Setup
 WIDTH, HEIGHT = 1000, 900
 WHITE = (255,255,255)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Player in the Sea")
+clock = pygame.time.Clock()
+
+# Constants
 BLACK = (0,0,0)
 SEA_BLUE = (0, 105, 148)
 GREEN = (0,255,0)
@@ -13,13 +22,9 @@ SAND_COLOR = (194, 178, 128)
 FPS = 60
 font_small = pygame.font.Font("Assets\Kenney Pixel.ttf", 50)
 font_large = pygame.font.Font("Assets\Kenney Pixel.ttf", 150)
-
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Player in the Sea")
-clock = pygame.time.Clock()
-
-# Some other Constants
 MAX_BULLETS = 6
+
+
 
 """CLASSES"""
 
@@ -111,14 +116,18 @@ class Island():
         self.posx, self.posy = x, y
         self.size = 100
         self.rect = pygame.Rect(x, y, self.size, self.size)
+        self.sand = pygame.image.load("Assets/Simple_Sand.png")
+        self.sand = pygame.transform.scale(self.sand, (self.size, self.size))
+        self.water = pygame.image.load("Assets/Water_7.png")
+        self.water = pygame.transform.scale(self.water, (self.size, self.size))
 
         self.is_island = False
 
     def display(self):
         if self.is_island == False:
-            pygame.draw.rect(screen, SEA_BLUE, self.rect)
+            screen.blit(self.water, self.rect.topleft)
         else:
-            pygame.draw.rect(screen, SAND_COLOR, self.rect)
+            screen.blit(self.sand, self.rect.topleft)
 
 class Zombie():
     def __init__(self, x, y, width, height, speed, color):
@@ -209,6 +218,7 @@ def main():
 
     running = True
     while running:
+        Button_Function.run
         screen.fill(SEA_BLUE)
         current_time = pygame.time.get_ticks()
 
