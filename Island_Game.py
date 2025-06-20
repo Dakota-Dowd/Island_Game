@@ -1,7 +1,7 @@
 """
 This is the main file of the Island Game
 """
-# Setting up
+
 import pygame
 import random
 from Classes_Functions import Button_Function
@@ -38,6 +38,8 @@ class Player():
         self.speed = speed
         self.color = color
         self.lives = lives
+        self.player = pygame.image.load("Assets/Survivor_Image.png")
+        self.player = pygame.transform.scale(self.player, (width, height))
 
         self.hit_counted = False
         self.last_hit_time = pygame.time.get_ticks()
@@ -45,7 +47,7 @@ class Player():
         self.rect = pygame.Rect(x, y, width, height)
 
     def display(self):
-        pygame.draw.rect(screen, WHITE, self.rect)
+        screen.blit(self.player, self.rect.topleft)
 
     def update(self, dy, dx):
         # Movement
@@ -120,14 +122,24 @@ class Island():
         self.sand = pygame.transform.scale(self.sand, (self.size, self.size))
         self.water = pygame.image.load("Assets/Water_7.png")
         self.water = pygame.transform.scale(self.water, (self.size, self.size))
-
         self.is_island = False
+
+        # Tree Stuff
+        self.tree_size = 40
+        random_tree_x = random.randint(1,self.size - self.tree_size)
+        random_tree_y = random.randint(1,self.size - self.tree_size)
+        self.tree_posx, self.tree_posy = (self.posx + random_tree_x), (self.posy + random_tree_y)
+        self.tree_rect = pygame.Rect(self.tree_posx, self.tree_posy, self.tree_size, self.tree_size)
+        self.tree = pygame.image.load("Assets/Tree_Image.png")
+        self.tree = pygame.transform.scale(self.tree, (self.tree_size, self.tree_size))
 
     def display(self):
         if self.is_island == False:
             screen.blit(self.water, self.rect.topleft)
         else:
             screen.blit(self.sand, self.rect.topleft)
+            screen.blit(self.tree, self.tree_rect.topleft)
+
 
 class Zombie():
     def __init__(self, x, y, width, height, speed, color):
@@ -137,13 +149,17 @@ class Zombie():
         self.height = height
         self.speed = speed
         self.color = color
+        self.zombie = pygame.image.load("Assets/Pirate_Image.png")
+        self.zombie = pygame.transform.scale(self.zombie, (width,height))
         self.dy = 0
         self.dx = 0
 
         self.rect = pygame.Rect(x, y, width, height)
 
+    # def display(self):
+    #     pygame.draw.rect(screen, self.color, self.rect)
     def display(self):
-        pygame.draw.rect(screen, self.color, self.rect)
+        screen.blit(self.zombie, self.rect.topleft)
 
     def update(self, x_player, y_player):
         # Follow the player
@@ -192,9 +208,11 @@ def start_menu(current_time, start_time):
 def main():
     start_time = pygame.time.get_ticks()
     hit_refesh_time = pygame.time.get_ticks()
+    bullet_reload_time = pygame.time.get_ticks() 
+
 
     # create Objects
-    player = Player(WIDTH//2, HEIGHT//2, 20, 20, 10, WHITE, 3)
+    player = Player(WIDTH//2, HEIGHT//2, 40, 40, 10, WHITE, 3)
     # Initialize variables
     list_islands = []
     list_bullets = []
@@ -221,6 +239,7 @@ def main():
         Button_Function.run
         screen.fill(SEA_BLUE)
         current_time = pygame.time.get_ticks()
+   
 
         for event in pygame.event.get(): # Button Handling
             if event.type == pygame.QUIT:
@@ -269,8 +288,9 @@ def main():
                     ammo_count -= 1
 
                 # Reload with the space button
-                if event.key == pygame.K_SPACE and ammo_count <= 0:
+                if event.key == pygame.K_SPACE and ammo_count <= 0 and current_time - bullet_reload_time >= 1000:
                         ammo_count = 6
+                        bullet_reload_time = current_time
 
             # Stop the player when the keys are lifted
             if event.type == pygame.KEYUP:
@@ -305,71 +325,71 @@ def main():
 
         display_all() # call the function
 
-        # Start Message
-        start_menu(current_time, start_time)
-
-    
         """UPDATE"""
-        if current_time - start_time >= 5000:
-            # Display/Update bullets
+
+        # Display/Update bullets
+        for bullet in list_bullets:
+                if bullet.posx <= 0 or bullet.posx >= WIDTH or bullet.posy <= 0 or bullet.posy >= HEIGHT:
+                    list_bullets.remove(bullet)
+                else:
+                    bullet.display()
+                    bullet.update()
+
+        # update objects
+        prev_x = player.posx
+        prev_y = player.posy
+        player.update(dy, dx)
+
+        # Island collision
+        for island in list_islands:
+            if island.is_island == False:
+                if pygame.Rect.colliderect(island.rect, player.rect):
+                    player.posx = prev_x
+                    player.posy = prev_y
+        
+        """Loop through each zombie, then loop through each island that are sand. If is_island = True, then slow down the zombie. Set their speed to something slower"""
+        # for zombie in list_zombies:
+        #     if pygame.Rect.colliderect(zombie, ):
+
+
+        # Make a new zombie periodically
+        x_zombie = random.randint(0, WIDTH)
+        y_zombie = random.randint(0, HEIGHT)
+        if current_time - hit_refesh_time >= spawn_interval:
+            # Pick a random location for the zombie to spawn
+            rand_side = random.randint(1, 4)
+            if rand_side == 1:
+                zombie = Zombie(0,y_zombie,40, 40, 1, GREEN) # left side
+            elif rand_side == 2:
+                zombie = Zombie(WIDTH,y_zombie,40, 40, 1, GREEN) # right side
+            elif rand_side == 3:
+                zombie = Zombie(x_zombie,0,40, 40, 1, GREEN) # top
+            else:
+                zombie = Zombie(x_zombie, HEIGHT, 40, 40, 1, GREEN) # bottom
+            list_zombies.append(zombie)
+            hit_refesh_time = current_time
+            spawn_interval = random.randint(200, 2000)
+
+        # UPDATE ZOMBIES
+        for zombie in list_zombies:
+            zombie.display()
+            zombie.update(player.posx, player.posy)
+
+            # bullet collision
             for bullet in list_bullets:
-                    if bullet.posx <= 0 or bullet.posx >= WIDTH or bullet.posy <= 0 or bullet.posy >= HEIGHT:
-                        list_bullets.remove(bullet)
-                    else:
-                        bullet.display()
-                        bullet.update()
+                if zombie.rect.colliderect(bullet.get_rect()):
+                    list_bullets.remove(bullet)
+                    list_zombies.remove(zombie)
+                    kill_count += 1
+                    points += 1
 
-            # update objects
-            prev_x = player.posx
-            prev_y = player.posy
-            player.update(dy, dx)
+            # Lose lives when the zombie hits you
+            if pygame.Rect.colliderect(player.get_rect(), zombie.get_rect()):
 
-            # Island collision
-            for island in list_islands:
-                if island.is_island == False:
-                    if pygame.Rect.colliderect(island.rect, player.rect):
-                        player.posx = prev_x
-                        player.posy = prev_y
-
-
-            # Make a new zombie periodically
-            x_zombie = random.randint(0, WIDTH)
-            y_zombie = random.randint(0, HEIGHT)
-            if current_time - hit_refesh_time >= spawn_interval:
-                # Pick a random location for the zombie to spawn
-                rand_side = random.randint(1, 4)
-                if rand_side == 1:
-                    zombie = Zombie(0,y_zombie,20, 20, 1, GREEN) # left side
-                elif rand_side == 2:
-                    zombie = Zombie(WIDTH,y_zombie,20, 20, 1, GREEN) # right side
-                elif rand_side == 3:
-                    zombie = Zombie(x_zombie,0,20, 20, 1, GREEN) # top
-                else:
-                    zombie = Zombie(x_zombie, HEIGHT, 20, 20, 1, GREEN) # bottom
-                list_zombies.append(zombie)
-                hit_refesh_time = current_time
-                spawn_interval = random.randint(200, 2000)
-
-            # UPDATE ZOMBIES
-            for zombie in list_zombies:
-                zombie.display()
-                zombie.update(player.posx, player.posy)
-
-                # bullet collision
-                for bullet in list_bullets:
-                    if zombie.rect.colliderect(bullet.get_rect()):
-                        list_bullets.remove(bullet)
-                        list_zombies.remove(zombie)
-                        kill_count += 1
-                        points += 1
-
-                # Lose lives when the zombie hits you
-                if pygame.Rect.colliderect(player.get_rect(), zombie.get_rect()):
-
-                    if player.hit_counted == False:
-                        player.hit()
-                else:
-                    player.hit_counted = False #if they aren't touching reset hit_counted to false
+                if player.hit_counted == False:
+                    player.hit()
+            else:
+                player.hit_counted = False #if they aren't touching reset hit_counted to false
 
         # update screen
         pygame.display.update()
