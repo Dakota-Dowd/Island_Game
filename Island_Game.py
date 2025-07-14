@@ -1,5 +1,5 @@
 """
-Island Game
+Island Game!
 """
 
 import pygame
