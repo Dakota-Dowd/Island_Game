@@ -1,5 +1,5 @@
 """
-This is the main file of the Island Game
+Island Game
 """
 
 import pygame
