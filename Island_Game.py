@@ -4,7 +4,7 @@ Island Game!
 
 import pygame
 import random
-from Classes_Functions import Button_Function
+from Classes_Functions.Button_Function import button
 pygame.init()
 
 # Screen Setup

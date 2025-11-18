@@ -87,9 +87,6 @@ def run():
             if event.type == pygame.QUIT:
                 Start = True
 
-        
-
-
         # RENDER YOUR GAME HERE
 
         # flip() the display to put your work on screen
