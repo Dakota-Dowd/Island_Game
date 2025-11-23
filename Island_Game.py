@@ -4,7 +4,8 @@ Island Game!
 
 import pygame
 import random
-from Classes_Functions.Button_Function import button
+import scripts.button_function as button_function
+from scripts.button_function import button
 pygame.init()
 
 # Screen Setup
@@ -20,11 +21,9 @@ SEA_BLUE = (0, 105, 148)
 GREEN = (0,255,0)
 SAND_COLOR = (194, 178, 128)
 FPS = 60
-font_small = pygame.font.Font("Assets\Kenney Pixel.ttf", 50)
-font_large = pygame.font.Font("Assets\Kenney Pixel.ttf", 150)
+font_small = pygame.font.Font("assets/fonts/Kenney Pixel.ttf", 50)
+font_large = pygame.font.Font("assets/fonts/Kenney Pixel.ttf", 150)
 MAX_BULLETS = 6
-
-
 
 """CLASSES"""
 
@@ -38,7 +37,7 @@ class Player():
         self.speed = speed
         self.color = color
         self.lives = lives
-        self.player = pygame.image.load("Assets/Survivor_Image.png")
+        self.player = pygame.image.load("assets/images/Survivor_Image.png")
         self.player = pygame.transform.scale(self.player, (width, height))
 
         self.hit_counted = False
@@ -118,9 +117,9 @@ class Island():
         self.posx, self.posy = x, y
         self.size = 100
         self.rect = pygame.Rect(x, y, self.size, self.size)
-        self.sand = pygame.image.load("Assets/Simple_Sand.png")
+        self.sand = pygame.image.load("assets/images/Simple_Sand.png")
         self.sand = pygame.transform.scale(self.sand, (self.size, self.size))
-        self.water = pygame.image.load("Assets/Water_7.png")
+        self.water = pygame.image.load("assets/images/Water_7.png")
         self.water = pygame.transform.scale(self.water, (self.size, self.size))
         self.is_island = False
 
@@ -130,7 +129,7 @@ class Island():
         random_tree_y = random.randint(1,self.size - self.tree_size)
         self.tree_posx, self.tree_posy = (self.posx + random_tree_x), (self.posy + random_tree_y)
         self.tree_rect = pygame.Rect(self.tree_posx, self.tree_posy, self.tree_size, self.tree_size)
-        self.tree = pygame.image.load("Assets/Tree_Image.png")
+        self.tree = pygame.image.load("assets/images/Tree_Image.png")
         self.tree = pygame.transform.scale(self.tree, (self.tree_size, self.tree_size))
 
     def display(self):
@@ -149,7 +148,7 @@ class Zombie():
         self.height = height
         self.speed = speed
         self.color = color
-        self.zombie = pygame.image.load("Assets/Pirate_Image.png")
+        self.zombie = pygame.image.load("assets/images/Pirate_Image.png")
         self.zombie = pygame.transform.scale(self.zombie, (width,height))
         self.dy = 0
         self.dx = 0
@@ -236,7 +235,7 @@ def main():
 
     running = True
     while running:
-        Button_Function.run
+        button_function.run
         screen.fill(SEA_BLUE)
         current_time = pygame.time.get_ticks()
    
