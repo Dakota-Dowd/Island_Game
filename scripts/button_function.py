@@ -1,26 +1,11 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 
-# pygame setup
-pygame.init()
-
-WIDTH, HEIGHT = 1000, 900
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Buttons")
-clock = pygame.time.Clock()
-
-
-
-# Colors and Fonts
-SEA_BLUE = (0, 105, 148)
-WHITE = (255, 255, 255)
-font = pygame.font.SysFont("arialblack", 40)
-font_small = pygame.font.Font("assets/fonts/Kenney Pixel.ttf", 50)
-TEXT_COL = (255,255,255)
-
 # Load Button Images
-start_img = pygame.image.load("assets/images/Sandy_Start_Button.png").convert_alpha()
-# exit_img = pygame.image.load("Assets/Sandy_Start_Button.png").convert_alpha()
+def load_images():
+    start_img = pygame.image.load("assets/images/Sandy_Start_Button.png").convert_alpha()
+    return start_img
+    # exit_img = pygame.image.load("Assets/Sandy_Start_Button.png").convert_alpha()
 
 # Class
 class button():
@@ -32,10 +17,9 @@ class button():
         self.rect.center = (x, y)
         self.clicked = False
 
-    def draw(self):
+    def draw(self, screen):
         action = False
-        # Get mouse position
-        pos = pygame.mouse.get_pos()
+        pos = pygame.mouse.get_pos() # Get mouse position
 
         # Check mouseover and clicked conditions
         if self.rect.collidepoint(pos):
@@ -50,8 +34,20 @@ class button():
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
         return action
+    
+def Menu(screen, color, mouse_rect):
+    running = True
 
-def create_text(text, x, y, font_size, color):
+    while running:
+        screen.fill(color)
+
+        for event in pygame.get_events():
+            if event.type == pygame.QUIT:
+                running = False
+            
+        button()
+
+def create_text(screen, text, x, y, font_size, color):
     text = font_size.render(text, True, color)
     text_frame = text.get_rect()
     text_frame.center = (x, y)
@@ -59,21 +55,23 @@ def create_text(text, x, y, font_size, color):
 
 
 
-start_button = button(WIDTH//2, HEIGHT//2, start_img, 5)
+
 # exit_button = Button(450, 200, exit_img, 0.8)
 
-def run():
+def run(screen, clock, WIDTH, HEIGHT, font_small, SEA_BLUE, WHITE):
+    start_img = load_images()
+    start_button = button(WIDTH//2, HEIGHT//2, start_img, 5)
     Start = False
     while Start == False:
 
         screen.fill(SEA_BLUE)
-        create_text(f"Kill Zombies to gain points.", WIDTH//2, 100, font_small, WHITE)
-        create_text(f"Click on anywhere in the water to create a new island!", WIDTH//2 + 30, 150, font_small, WHITE)
-        create_text(f"(For a fee of 10 points, of course...)", WIDTH//2 + 30, 200, font_small, WHITE)
-        create_text(f"Use WASD keys to move", WIDTH//2, HEIGHT - 150, font_small, WHITE)
-        create_text(f"UP/DOWN/LEFT/RIGHT to shoot, and SPACE to reload.", WIDTH//2, HEIGHT - 100, font_small, WHITE)
+        create_text(screen, f"Kill Zombies to gain points.", WIDTH//2, 100, font_small, WHITE)
+        create_text(screen, f"Click on anywhere in the water to create a new island!", WIDTH//2 + 30, 150, font_small, WHITE)
+        create_text(screen, f"(For a fee of 10 points, of course...)", WIDTH//2 + 30, 200, font_small, WHITE)
+        create_text(screen, f"Use WASD keys to move", WIDTH//2, HEIGHT - 150, font_small, WHITE)
+        create_text(screen, f"UP/DOWN/LEFT/RIGHT to shoot, and SPACE to reload.", WIDTH//2, HEIGHT - 100, font_small, WHITE)
         
-        if start_button.draw():
+        if start_button.draw(screen):
             Start = True
         # if exit_button.draw():
         #     running = False
@@ -93,6 +91,3 @@ def run():
         pygame.display.update()
 
         clock.tick(60)  # limits FPS to 60
-
-run()
-pygame.quit()

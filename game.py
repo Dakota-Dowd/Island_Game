@@ -2,10 +2,7 @@
 Island Game!
 """
 
-import pygame
-import random
-import scripts.button_function as button_function
-from scripts.button_function import button
+from scripts import pygame, random, button, Menu, run
 pygame.init()
 
 # Screen Setup
@@ -233,9 +230,10 @@ def main():
     list_islands[40].is_island = True
     list_islands[49].is_island = True
 
+    run(screen, clock, WIDTH, HEIGHT, font_small, SEA_BLUE, WHITE)
     running = True
     while running:
-        button_function.run
+
         screen.fill(SEA_BLUE)
         current_time = pygame.time.get_ticks()
    
