@@ -1,6 +1,6 @@
 import pygame
 import random
 
-from .button_function import button, menu, run
+from .button_function import button, Menu, run
 
 __all__ = ['pygame', 'random', 'button', 'menu', 'run']
